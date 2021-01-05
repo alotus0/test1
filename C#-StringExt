@@ -1,0 +1,159 @@
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using static System.Math;
+
+namespace CsComm
+{
+    public static class StringExt
+    {
+        public static bool IsNullOrWhiteSpace(this string str)
+        {
+            return string.IsNullOrWhiteSpace(str);
+        }
+
+        public static bool IsNullOrEmpty(this string str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
+
+        /// <summary>
+        /// 将字符串转为int32，异常则返回默认值
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="def"></param>
+        /// <returns></returns>
+        public static Int32 ToInt32(this string str, int def = 0)
+        {
+            try
+            {
+                if (str.IsNullOrWhiteSpace())
+                {
+                    return def;
+                }
+                else
+                {
+                    return Convert.ToInt32(str);
+                }
+            }
+            catch (Exception ex)
+            {
+                return def;
+            }
+        }
+
+        public static UInt32 ToUInt32(this string str, uint def = 0)
+        {
+            try
+            {
+                if (str.IsNullOrWhiteSpace())
+                {
+                    return def;
+                }
+                else
+                {
+                    return Convert.ToUInt32(str);
+                }
+            }
+            catch (Exception ex)
+            {
+                return def;
+            }
+        }
+
+        /// <summary>
+        /// 将16进制字符串转为int32，异常则返回默认值
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="def"></param>
+        /// <returns></returns>
+        public static UInt32 ToInt32H(this string str, int def = 0)
+        {
+            try
+            {
+                if (str.IsNullOrWhiteSpace())
+                {
+                    return (UInt32)def;
+                }
+                else
+                {
+                    return Convert.ToUInt32(str, 16);
+                }
+            }
+            catch (Exception ex)
+            {
+                return (UInt32)def;
+            }
+        }
+
+        /// <summary>
+        /// 拼接List<string>元素
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="sp">分隔字符</param>
+        /// <returns></returns>
+        public static string Join(this List<string> list, string sp = "")
+        {
+            if (list == null || list.Count == 0)
+            {
+                return null;
+            }
+            return string.Join(sp, list.ToArray());
+        }
+
+        /// <summary>
+        /// 判断是否为数字 10进制包含小数
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool IsNumber(this string str)
+        {
+            if (str.IsNullOrWhiteSpace())
+            {
+                return false;
+            }
+            return Regex.IsMatch(str, @"^[+-]?\d*[.]?\d*$");
+        }
+
+        /// <summary>
+        /// 判断是否为int
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool IsInt(this string str)
+        {
+            if (str.IsNullOrWhiteSpace())
+            {
+                return false;
+            }
+            return Regex.IsMatch(str, @"^[+-]?\d*$");
+        }
+
+        /// <summary>
+        /// 判断是否为uint
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool IsUInt(this string str)
+        {
+            if (str.IsNullOrWhiteSpace())
+            {
+                return false;
+            }
+            return Regex.IsMatch(str, @"^\d*$");
+        }
+
+        //从List头部弹出n个元素
+        public static List<Byte> PopHead(this List<Byte> list, int n = 0)
+        {
+            if (list == null || list.Count == 0 || n <= 0)
+            {
+                return null;
+            }
+
+            list.RemoveRange(0, Min(n, list.Count));
+            return list;
+        }
+    }
+}
+
