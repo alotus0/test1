@@ -1,0 +1,87 @@
+using System;
+
+namespace CsComm
+{
+    public class AkLog
+    {
+        private static object lockObj = new object();
+        private static string _logPath = System.AppDomain.CurrentDomain.BaseDirectory + "Log\\";
+
+        public static string LogPath
+        {
+            set { _logPath = value; }
+            get { return _logPath; }
+        }
+
+        public static void WriteLog(string path, string filename, string msg)
+        {
+            LogPath = path;
+            LogAsync(msg, filename);
+        }
+
+        public static void Log(string msg, string path, string filename)
+        {
+            LogPath = path;
+            LogAsync(msg, filename);
+        }
+
+        public static void Log(string msg, string filename)
+        {
+            LogPath = @"..\LOG";
+            LogAsync(msg, filename);
+        }
+
+        public static void Log(string msg)
+        {
+            LogPath = @"..\LOG";
+            LogAsync(msg, "dafault.log");
+        }
+
+
+        public static void WriteLog(string msg, string fileName)
+        {
+            System.Threading.Monitor.Enter(lockObj);
+            try
+            {
+                fileName = string.Format("{0}_{1}", DateTime.Now.ToString("yyyyMMdd"), fileName);
+                if (!System.IO.Directory.Exists(LogPath))
+                {
+                    System.IO.Directory.CreateDirectory(LogPath);
+                }
+                var fi = new System.IO.FileInfo(LogPath + "\\" + fileName);
+                if (fi.Exists && fi.Length >= 2 * 1024 * 1024)
+                {
+                    fi.MoveTo(LogPath + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_long_" + fileName);
+                }
+                string logContent = string.Format("{0}\t{1}", DateTime.Now.ToString("MM-dd HH:mm:ss fff"), msg);
+                using (System.IO.StreamWriter SW = System.IO.File.AppendText(LogPath + "\\" + fileName))
+                {
+                    SW.WriteLine(logContent);
+                }
+            }
+            catch
+            {
+                return;
+            }
+            finally
+            {
+                System.Threading.Monitor.Exit(lockObj);
+            }
+        }
+
+        public static void LogAsync(string msg, string fileName = "Db.log")
+        {
+            var logAsyn = new Action(() =>
+            {
+                WriteLog(msg, fileName);
+            });
+            logAsyn.BeginInvoke(null, null);
+        }
+
+
+        public static void Error(string msg, string fileName = "Err.log")
+        {
+            LogAsync(msg, fileName);
+        }
+    }
+}
